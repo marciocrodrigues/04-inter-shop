@@ -8,6 +8,7 @@ import { useKeenSlider } from 'keen-slider/react'
 import { HomeContainer, Product } from '../styles/pages/home'
 
 import 'keen-slider/keen-slider.min.css'
+import { useRouter } from 'next/router'
 
 interface HomeProps {
   products: {
@@ -19,6 +20,8 @@ interface HomeProps {
 }
 
 export default function Home({ products }: HomeProps) {
+  const { isFallback } = useRouter()
+
   const [sliderRef] = useKeenSlider({
     slides: {
       perView: 3,
@@ -26,11 +29,20 @@ export default function Home({ products }: HomeProps) {
     },
   })
 
+  // Valida se o está carregando os dados da pagina no getStaticProps
+  if (isFallback) {
+    return <p>Loading</p>
+  }
+
   return (
     <HomeContainer ref={sliderRef} className="keen-slider">
       {products.map((product) => {
         return (
-          <Link href={`/product/${product.id}`} key={product.id}>
+          <Link
+            href={`/product/${product.id}`}
+            key={product.id}
+            prefetch={false}
+          >
             <Product className="keen-slider__slide">
               <Image src={product.imageUrl} width={520} height={480} alt="" />
               <footer>
